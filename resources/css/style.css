@@ -1,0 +1,92 @@
+/* Keyframes untuk animasi */
+@keyframes float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes spinSlow {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounceSlow {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* Styling untuk header */
+.header-section {
+    text-align: center;
+    padding: 50px 0;
+}
+
+.sub-heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4b5563; /* Gray-800 */
+}
+
+.main-heading {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fb923c; /* Orange-600 */
+    margin: 20px 0;
+    animation: float 6s ease-in-out infinite; /* Animasi mengapung */
+}
+
+.highlight {
+    color: #047857; /* Green-700 */
+}
+
+.description {
+    font-size: 1.125rem;
+    color: #6b7280; /* Gray-600 */
+    margin-bottom: 24px;
+}
+
+.explore-btn {
+    background-color: #047857; /* Green-700 */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 9999px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.explore-btn:hover {
+    background-color: #065f46; /* Darker green for hover effect */
+}
+
+.image-container {
+    margin-top: 40px;
+}
+
+/* Animasi untuk gambar */
+.image-container img {
+    width: 100%;
+    max-width: 600px;
+    display: block;
+    margin: 0 auto;
+    animation: spinSlow 20s linear infinite; /* Animasi gambar berputar */
+}
+
+/* Animasi tombol (bounce) */
+.explore-btn {
+    animation: bounceSlow 3s ease-in-out infinite;
+}
