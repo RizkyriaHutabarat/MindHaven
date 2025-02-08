@@ -16,6 +16,10 @@ use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+use Illuminate\Support\Facades\Cookie;
 
 
 
@@ -50,74 +54,40 @@ class AuthController extends Controller
                 'time' => now(),
                 'session_id' => session()->getId(),
             ]);
-
+    
             $credentials = $request->validate([
                 'email' => ['required', 'email'],
                 'password' => ['required'],
             ]);
-
-            // Debug guard states sebelum login
-            Log::info('Guard States Before Login', [
-                'admin_check' => Auth::guard('admin')->check(),
-                'psikolog_check' => Auth::guard('psikolog')->check(),
-                'web_check' => Auth::guard('web')->check(),
-            ]);
-
+    
             // Try admin login
             if (Auth::guard('admin')->attempt($credentials)) {
-                Log::info('Admin Login Success', [
-                    'user' => Auth::guard('admin')->user(),
-                    'session_id' => session()->getId()
-                ]);
-
-
-                $token = $request->user('admin')->createToken('admin_token')->plainTextToken;
-
-                $request->session()->regenerate();
-                return redirect()->intended(route('admin.dashboard'))
-                    ->with('admin_token', $token);
+                $user = Auth::guard('admin')->user();
+                $token = $this->generateJwtToken($user, 'admin');
+                return $this->redirectWithToken('admin.dashboard', $token);
             }
-
-            // Debug Psikolog attempt
+    
+            // Try psikolog login
             $psikolog = Psikolog::where('email', $credentials['email'])->first();
             Log::info('Psikolog Check', [
                 'found' => $psikolog ? true : false,
                 'password_check' => $psikolog ? Hash::check($credentials['password'], $psikolog->password) : false
             ]);
-
+    
             if ($psikolog && Hash::check($credentials['password'], $psikolog->password)) {
                 Auth::guard('psikolog')->login($psikolog);
-                Log::info('Psikolog Login Success', [
-                    'user' => $psikolog,
-                    'session_id' => session()->getId()
-                ]);
-
-                $token = $request->user('psikolog')->createToken('psikolog_token')->plainTextToken;
-
-                $request->session()->regenerate();
-                return redirect()->route('psikolog.dashboard')
-                    ->with('psikolog_token', $token);
+                $token = $this->generateJwtToken($psikolog, 'psikolog');
+                return $this->redirectWithToken('psikolog.dashboard', $token);
             }
-
+    
             // Try regular user login
             if (Auth::guard('web')->attempt($credentials)) {
-                Log::info('User Login Success', [
-                    'user' => Auth::guard('web')->user(),
-                    'session_id' => session()->getId()
-                ]);
-
-                $token = $request->user()->createToken('user_token')->plainTextToken;
-
-                $request->session()->regenerate();
-                return redirect()->intended(route('dashboard'))
-                    ->with('user_token', $token);
+                $user = Auth::guard('web')->user();
+                $token = $this->generateJwtToken($user, 'user');
+                return $this->redirectWithToken('dashboard', $token);
             }
-
-            Log::error('Login Failed', [
-                'email' => $request->email,
-                'time' => now()
-            ]);
-
+    
+            Log::error('Login Failed', ['email' => $request->email, 'time' => now()]);
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
@@ -126,8 +96,27 @@ class AuthController extends Controller
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            throw $e;
+            return response()->json(['error' => 'Login failed'], 500);
         }
+    }
+    
+    private function generateJwtToken($user, $role)
+    {
+        $payload = [
+            'iss' => config('app.url'),
+            'sub' => $user->id,
+            'role' => $role,
+            'iat' => now()->timestamp,
+            'exp' => now()->addHours(2)->timestamp,
+        ];
+    
+        return JWT::encode($payload, env('JWT_SECRET'), 'HS256');
+    }
+    
+    private function redirectWithToken($route, $token)
+    {
+        $cookie = Cookie::make('jwt_token', $token, 120, '/', null, false, true);
+        return redirect()->route($route)->withCookie($cookie);
     }
 
     public function showRegister()
@@ -191,25 +180,35 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-       // Hapus semua session dan regenerate
-    $request->session()->flush();
-
-    // Logout dari semua guard
-    Auth::guard('web')->logout();
-    Auth::guard('admin')->logout();
-    Auth::guard('psikolog')->logout();
-
-    // Invalidate session dan regenerate CSRF token
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    // Clear cookie auth
-    return redirect('/login')->withCookies([
-        cookie()->forget('laravel_session'),
-        cookie()->forget('XSRF-TOKEN')
-    ]);
+        try {
+            // Hapus semua session dan regenerate
+            $request->session()->flush();
+    
+            // Logout dari semua guard
+            Auth::guard('web')->logout();
+            Auth::guard('admin')->logout();
+            Auth::guard('psikolog')->logout();
+    
+            // Invalidate session dan regenerate CSRF token
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+    
+            // Clear cookie auth (JWT token dan session-related cookies)
+            return redirect('/login')->withCookies([
+                cookie()->forget('jwt_token'),
+                cookie()->forget('laravel_session'),
+                cookie()->forget('XSRF-TOKEN')
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Logout Exception', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+    
+            return redirect('/login')->with('error', 'Logout failed');
+        }
     }
-
+    
 
     public function riwayatLaporanUser()
     {
