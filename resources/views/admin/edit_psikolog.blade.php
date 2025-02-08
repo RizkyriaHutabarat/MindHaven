@@ -37,45 +37,30 @@
                     <div class="mb-4">
                         <label for="nama" class="block text-gray-700 font-semibold mb-2">Nama</label>
                         <input type="text" id="nama" name="nama" value="{{ old('nama', $psikolog->nama) }}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
-                        @error('nama')
-                            <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Email Input -->
                     <div class="mb-4">
                         <label for="email" class="block text-gray-700 font-semibold mb-2">Email</label>
                         <input type="email" id="email" name="email" value="{{ old('email', $psikolog->email) }}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
-                        @error('email')
-                            <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Specialization Input -->
                     <div class="mb-4">
                         <label for="spesialisasi" class="block text-gray-700 font-semibold mb-2">Spesialisasi</label>
                         <input type="text" id="spesialisasi" name="spesialisasi" value="{{ old('spesialisasi', $psikolog->spesialisasi) }}" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                        @error('spesialisasi')
-                            <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Bio Input -->
                     <div class="mb-4">
                         <label for="bio" class="block text-gray-700 font-semibold mb-2">Bio</label>
                         <textarea id="bio" name="bio" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">{{ old('bio', $psikolog->bio) }}</textarea>
-                        @error('bio')
-                            <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Photo Input -->
                     <div class="mb-4">
                         <label for="foto" class="block text-gray-700 font-semibold mb-2">Foto</label>
                         <input type="file" id="foto" name="foto" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
-                        @error('foto')
-                            <div class="text-red-500 text-sm mt-2">{{ $message }}</div>
-                        @enderror
                         @if($psikolog->foto)
                             <div class="mt-4">
                                 <img src="{{ asset('storage/' . $psikolog->foto) }}" alt="Foto Psikolog" class="w-32 h-32 object-cover rounded-lg">

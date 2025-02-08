@@ -3,25 +3,7 @@
 @section('content')
     <div class="container mt-4">
         <h2 class="mb-4">Manage Laporan Psikolog</h2>
-        @if(session('error'))
-    <div class="alert alert-danger">
-        {{ session('error') }}
-    </div>
-@endif
-
-        <form action="{{ route('laporan.download') }}" method="GET" class="mb-4">
-            <div class="form-group">
-                <label for="status_laporan">Pilih Status Laporan:</label>
-                <select name="status_laporan" id="status_laporan" class="form-control" required>
-                    <option value="pending" {{ old('status_laporan') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="selesai" {{ old('status_laporan') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                    <option value="ditolak" {{ old('status_laporan') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Download Laporan</button>
-        </form>
-
+        
         <!-- Tabel Responsif -->
         <div class="table-responsive">
             <table class="table table-bordered table-hover table-striped align-middle">

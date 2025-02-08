@@ -1,74 +1,57 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\PsikologController;
+use App\Http\Controllers\LandingPageController;
 use App\Http\Controllers\JadwalKonsulController;
+
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PembayaranController;
-use App\Http\Controllers\Api\AuthController as ApiAuthController;
+use App\Http\Controllers\PsikologController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+
+
+
+// Public routes
+Route::get('/', [LandingPageController::class, 'index'])->name('landing.page');
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landing.page');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
-// Admin Dashboard
-Route::middleware('auth:admin')->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-});
 
-Route::get('/login', function () {
-    return view('auth.login');
-});
-
-// Psikolog Dashboard
-Route::middleware('auth:psikolog')->group(function () {
-    Route::get('/psikolog/dashboard', function () {
-        return view('psikolog.dashboard');
-    })->name('psikolog.dashboard');
-});
-
-// User Dashboard
-Route::middleware('auth:web')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('user.dashboard');
-    })->name('user.dashboard');
-});
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-Route::get('/dashboard', [AuthController::class, 'showDashboard'])->name('dashboard');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [AuthController::class, 'showDashboard'])->name('dashboard');
+});
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/jadwalkonsul', [JadwalKonsulController::class, 'index'])->name('jadwalkonsul.index');
 Route::post('/jadwalkonsul', [JadwalKonsulController::class, 'store'])->name('jadwalkonsul.store');
 Route::get('/user/jadwal', [JadwalKonsulController::class, 'showUserJadwal'])->name('user.jadwal');
 // Route untuk update jadwal
 Route::put('/jadwalkonsul/{id}', [JadwalKonsulController::class, 'update'])->name('jadwalkonsul.update');
 Route::get('/jadwalkonsul/{id}/edit', [JadwalKonsulController::class, 'showUpdateForm'])->name('jadwalkonsul.edit');
-    
+
 
 
 Route::get('/booking', [JadwalKonsulController::class, 'index'])->name('booking');
 Route::get('/nota/{id}', [PembelianController::class, 'showNota'])->name('nota');
 
 // Rute untuk pembayaran
-Route::get('payment/upload/{id}', [PembayaranController::class, 'showPaymentForm'])->name('payment.store');
+Route::get('payment/upload/{id}', [PembayaranController::class, 'showPaymentForm'])->name('payment.form');
 Route::post('payment/upload/{id}', [PembayaranController::class, 'store'])->name('payment.store');
 
 
 Route::prefix('admin')->group(function () {
-    Route::get('login', [AdminController::class, 'showLoginForm'])->name('admin.login');
+    Route::get('login', [AdminController::class, 'showLoginForm'])->name('admin.loginForm');
     Route::post('login', [AdminController::class, 'login'])->name('admin.login');
     Route::get('dashboard', [AdminController::class, 'showDashboard'])->middleware('auth:admin')->name('admin.dashboard');
     Route::post('logout', [AdminController::class, 'logout'])->name('admin.logout');
-    Route::get('/admin/login', [AdminController::class, 'showLoginForm'])->name('admin.loginForm');
 
 
     Route::middleware('auth:admin')->group(function () {
@@ -85,7 +68,7 @@ Route::prefix('admin')->group(function () {
         // Routes for managing paket
         Route::get('/pakets', [AdminController::class, 'managePakets'])->name('admin.manage_pakets');
         Route::get('/pakets/create', [AdminController::class, 'createPaket'])->name('admin.create_paket');
-        Route::post('/pakets', [AdminController::class, 'store'])->name('admin.store_paket');  
+        Route::post('/pakets', [AdminController::class, 'store'])->name('admin.store_paket');
         Route::get('/pakets/{id}/edit', [AdminController::class, 'editPaket'])->name('admin.edit_paket');
         Route::put('/pakets/{id}', [AdminController::class, 'updatePaket'])->name('admin.update_paket');
         Route::delete('/pakets/{id}', [AdminController::class, 'deletePaket'])->name('admin.delete_paket');
@@ -97,7 +80,7 @@ Route::prefix('admin')->group(function () {
          Route::delete('/delete_jadwalkonsul/{id}', [AdminController::class, 'deleteJadwalkonsul'])->name('delete_jadwalkonsul');
          Route::post('/admin/jadwalkonsul/{id}/status', [JadwalKonsulController::class, 'updateStatusPembayaran'])->name('admin.update_status_pembayaran');
 
-        
+
     });
 });
 
@@ -109,7 +92,7 @@ Route::prefix('psikolog')->group(function () {
     Route::post('/register', [PsikologController::class, 'register'])->name('psikolog.register.post');
     Route::get('/forgot-password', [PsikologController::class, 'showForgotPasswordForm'])->name('psikolog.forgot_password');
     Route::post('/forgot-password', [PsikologController::class, 'sendResetLink'])->name('psikolog.forgot_password.post');
-    
+
     Route::middleware('auth:psikolog')->group(function () {
         Route::get('/dashboard', [PsikologController::class, 'showDashboard'])->name('psikolog.dashboard');
         Route::get('/laporan', [PsikologController::class, 'showLaporanForm'])->name('psikolog.laporan.form');
@@ -118,8 +101,8 @@ Route::prefix('psikolog')->group(function () {
         Route::get('/laporan/edit/{laporanId}', [PsikologController::class, 'editLaporan'])->name('psikolog.laporan.edit');
         Route::put('/laporan/update/{laporanId}', [PsikologController::class, 'updateLaporan'])->name('psikolog.laporan.update');
         Route::post('/laporan/store/{jadwalId}', [PsikologController::class, 'storeLaporan'])->name('psikolog.laporan.store');
-        Route::get('/laporan/form/{jadwalId}', [PsikologController::class, 'showLaporanForm'])->name('psikolog.laporan.form');
-        Route::get('/laporan/download', [PsikologController::class, 'downloadFilteredLaporan'])->name('laporan.download');
+        Route::get('/laporan/form/{jadwalId}', [PsikologController::class, 'showLaporanForm'])->name('psikolog.laporan.forms');
+        Route::get('/laporan/form/{jadwalId}', [PsikologController::class, 'showLaporanForm'])->name('psikolog.laporan.forms');
 
     });
 });
@@ -137,10 +120,9 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/jadwal/store', [JadwalKonsulController::class, 'store'])->name('jadwal.store');
 Route::get('/nota/{id}', [JadwalKonsulController::class, 'showNota'])->name('nota.show');
 Route::get('/riwayat', [AuthController::class, 'riwayatLaporanUser'])->name('user.riwayat');
-// Route::get('/download-laporan', [AuthController::class, 'downloadLaporan'])->name('download.laporan');
-// Route::get('/download-laporan/{id}', [AuthController::class, 'downloadLaporan'])->name('download.laporan');
-Route::get('/download/all', [AuthController::class, 'downloadAllLaporan'])->name('download.all');
-Route::get('/download/{id}', [AuthController::class, 'downloadLaporanById'])->name('download.laporan');
+Route::get('/download-laporan', [AuthController::class, 'downloadLaporan'])->name('download.laporan');
+
+
 
 });
 
@@ -155,16 +137,7 @@ Route::prefix('admin')->middleware('auth')->name('admin.')->group(function () {
     Route::get('/edit-laporan-psikolog/{id}', [AdminController::class, 'editLaporanPsikolog'])->name('edit_laporan_psikolog');
     Route::delete('/delete-laporan-psikolog/{id}', [AdminController::class, 'deleteLaporanPsikolog'])->name('delete_laporan_psikolog');
     Route::get('/laporan-konsul', [AdminController::class, 'laporanKonsul'])->name('laporan-konsul');
-
-Route::post('/admin/download-laporan', [AdminController::class, 'downloadFilteredLaporan'])->name('admin.downloadLaporan');
 });
-
-// Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-//     Route::get('/manage-laporan-psikolog', [AdminController::class, 'manageLaporanPsikolog'])->name('manage-laporan-psikolog');
-//     Route::get('/edit-laporan-psikolog/{id}', [AdminController::class, 'editLaporanPsikolog'])->name('edit_laporan_psikolog');
-//     Route::delete('/delete-laporan-psikolog/{id}', [AdminController::class, 'deleteLaporanPsikolog'])->name('delete_laporan_psikolog');
-// });
-
 
 Route::get('/pembayaran/upload/{id}', [PembayaranController::class, 'formUpload'])->name('pembayaran.form');
 Route::post('/pembayaran/upload/{id}', [PembayaranController::class, 'upload'])->name('pembayaran.upload');

@@ -13,8 +13,6 @@ use App\Models\LaporanPsikolog;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
 
 class AdminController extends Controller
 {
@@ -131,8 +129,6 @@ class AdminController extends Controller
                 'spesialisasi' => 'nullable|string|max:255',
                 'bio' => 'nullable|string',
                 'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ], [
-                'required' => 'Form tidak boleh kosong. Harap isi semua kolom.',
             ]);
     
             // Update data psikolog
@@ -329,88 +325,4 @@ class AdminController extends Controller
         return redirect()->route('admin.manage-laporan-psikolog')->with('success', 'Laporan Psikolog berhasil dihapus!');
     }
 
-    public function downloadFilteredLaporan(Request $request)
-    {
-        Carbon::setLocale('id'); // Mengatur locale ke Indonesia
-    
-        // Validasi input request, hanya status laporan yang diperlukan
-        $request->validate([
-            'status_laporan' => 'required|in:pending,selesai,ditolak',
-        ]);
-    
-        // Ambil laporan sesuai dengan filter status
-        $laporans = LaporanPsikolog::query(); // Memulai query
-    
-        // Filter berdasarkan status laporan
-        $laporans->where('status_laporan', $request->status_laporan);
-    
-        $laporans = $laporans->get();
-    
-        // Jika tidak ada laporan yang ditemukan
-        if ($laporans->isEmpty()) {
-            return back()->with('error', 'Tidak ada laporan dengan filter status tersebut.');
-        }
-    
-        // Membuat file Word baru
-        $phpWord = new PhpWord();
-    
-        // Menambahkan total laporan di bagian atas dokumen
-        $section = $phpWord->addSection();
-        $section->addText('Total Laporan: ' . $laporans->count(), ['bold' => true, 'size' => 14, 'color' => '1F4E79'], ['alignment' => 'center']);
-        $section->addTextBreak(1);
-    
-        // Menambahkan laporan-laporan ke dalam dokumen
-        foreach ($laporans as $laporan) {
-            $section = $phpWord->addSection();
-    
-            // Menambahkan logo di bagian atas dokumen
-            $logoPath = public_path('assets/images/logomindhaven1.png');
-            if (file_exists($logoPath)) {
-                $section->addImage($logoPath, [
-                    'width' => 250,
-                    'height' => 150,
-                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
-                    'wrappingStyle' => 'inline',
-                ]);
-                $section->addTextBreak(1);
-            }
-    
-            // Judul Laporan
-            $section->addText('Laporan Psikolog', ['bold' => true, 'size' => 18, 'color' => '1F4E79'], ['alignment' => 'center']);
-            $section->addTextBreak(1);
-    
-            // Informasi Psikolog
-            $section->addText('Nama Psikolog: ' . $laporan->psikolog->nama, ['bold' => true, 'size' => 14, 'color' => '4F81BD']);
-            $section->addText('Tanggal Konsultasi: ' . \Carbon\Carbon::parse($laporan->jadwalKonsul->tanggal)->translatedFormat('l, d F Y'), ['size' => 12]);
-            $section->addText('Jam Konsultasi: ' . ($laporan->jadwalKonsul->jam ?? 'N/A'), ['size' => 12]);
-            $section->addText('Paket: ' . $laporan->paket->nama_paket, ['size' => 12]);
-            $section->addText('Harga: ' . ($laporan->paket->harga ?? 'N/A'), ['size' => 12]);
-    
-            // Hasil Konsultasi
-            $section->addText('Hasil: ', ['bold' => true, 'size' => 12]);
-            $section->addText(substr($laporan->hasil, 0, 1000) . '...', ['italic' => true, 'size' => 12]);
-    
-            // Rekomendasi
-            $section->addText('Rekomendasi: ', ['bold' => true, 'size' => 12]);
-            $section->addText($laporan->deskripsi_laporan, ['size' => 12]);
-    
-            // Status Laporan
-            $statusColor = $laporan->status_laporan === 'pending' ? 'FF0000' : '28A745';
-            $statusText = ucfirst($laporan->status_laporan);
-            $section->addText('Status: ' . $statusText, ['bold' => true, 'size' => 12, 'color' => $statusColor]);
-    
-            $section->addText('-----------------------------------------------------------', ['bold' => true, 'size' => 12]);
-            $section->addTextBreak(1);
-        }
-    
-        // Menyimpan dokumen sementara
-        $filename = 'Laporan_' . $request->status_laporan . '_' . now()->format('Ymd_His') . '.docx';
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $writer = IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tempFile);
-    
-        // Mengunduh file
-        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
-    }
-    
 }

@@ -7,7 +7,6 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MindHaven | Reschedule</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
@@ -46,12 +45,12 @@
             <div class="flex space-x-6 items-center">
                 <a class="text-gray-800 font-semibold hover:text-green-600" href="{{ route('dashboard') }}">Home</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Transaksi</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
     </nav>
@@ -62,7 +61,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-    
+
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show mb-6 absolute inset-0 flex flex-col items-center justify-center text-center p-4" role="alert">
         <div class="flex items-center space-x-3">
@@ -70,9 +69,9 @@
             <p class="text-lg text-red-700 font-bold">Jam ini sudah dipesan!</p>
         </div>
         <p class="text-sm text-gray-700 mt-2">Silakan pilih waktunya di bawah jam ini yang tersedia.</p>
-        
+
         <!-- Tombol Cancel di bawah dan lebih berwarna -->
-        <a href="{{ route('user.jadwal') }}" 
+        <a href="{{ route('user.jadwal') }}"
            class="mt-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition duration-300 shadow-md">
            Cancel
         </a>
@@ -102,19 +101,19 @@
                 <input type="hidden" name="jam" id="jam" value="{{ $jadwal->jam }}"> <!-- Hidden field for selected time -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Available Time Slots -->
-                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="09:00" 
+                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="09:00"
                         {{ $jadwal->jam == '09:00' ? 'class=selected' : '' }}>
                         09:00
                     </button>
-                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="11:00" 
+                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="11:00"
                         {{ $jadwal->jam == '11:00' ? 'class=selected' : '' }}>
                         11:00
                     </button>
-                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="13:00" 
+                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="13:00"
                         {{ $jadwal->jam == '13:00' ? 'class=selected' : '' }}>
                         13:00
                     </button>
-                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="15:00" 
+                    <button type="button" class="time-slot-btn bg-green-600 text-white p-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300" data-time="15:00"
                         {{ $jadwal->jam == '15:00' ? 'class=selected' : '' }}>
                         15:00
                     </button>
@@ -179,7 +178,7 @@
         if (tanggalInput) {
             const tanggal = new Date(tanggalInput);
             const options = { weekday: 'long' }; // Get the weekday name
-            
+
             const formattedDay = tanggal.toLocaleDateString('id-ID', options); // Format to day name
             hariInput.value = formattedDay; // Set the value to hidden input
         } else {
@@ -215,5 +214,14 @@
         });
     });
 </script>
+<script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
 
 @endsection

@@ -10,8 +10,6 @@ use App\Models\Psikolog;
 use App\Models\LaporanPsikolog;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
 
 class PsikologController extends Controller
 {
@@ -135,13 +133,14 @@ class PsikologController extends Controller
         return view('psikolog.laporan-form', compact('jadwal'));
     }
     
+    
 
     // Proses penyimpanan laporan
     public function submitLaporan(Request $request, $jadwalId)
     {
         $request->validate([
             'deskripsi_laporan' => 'required|string',
-            'hasil' => 'required|nullable|string',
+            'hasil' => 'nullable|string',
             'status_laporan' => 'required|string|in:pending,selesai,ditolak',
         ]);
     
@@ -249,7 +248,7 @@ class PsikologController extends Controller
         // Validasi data
         $validated = $request->validate([
             'deskripsi_laporan' => 'required|string',
-            'hasil' => 'required|nullable|string',
+            'hasil' => 'nullable|string',
             'status_laporan' => 'required|string|in:pending,selesai,ditolak',
         ]);
     
@@ -265,71 +264,36 @@ class PsikologController extends Controller
     
         return redirect()->route('psikolog.laporan.index')->with('success', 'Laporan berhasil diperbarui.');
     }
-    public function downloadFilteredLaporan(Request $request)
-    {
-        Carbon::setLocale('id'); // Mengatur locale ke Indonesia
-        $request->validate([
-            'status_laporan' => 'required|in:pending,selesai,ditolak'
-        ]);
     
-        $laporans = LaporanPsikolog::where('status_laporan', $request->status_laporan)->get();
+    // public function storeLaporan(Request $request, $jadwalId)
+    // {
+    //     // Validasi data
+    //     $validated = $request->validate([
+    //         'deskripsi_laporan' => 'required|string',
+    //         'hasil' => 'nullable|string',
+    //         'status_laporan' => 'required|string|in:pending,selesai,ditolak',
+    //     ]);
     
-        if ($laporans->isEmpty()) {
-            return back()->with('error', 'Tidak ada laporan dengan status tersebut.');
-        }
+    //     // Cek apakah psikolog yang sedang login sesuai dengan psikolog pada jadwal konsultasi
+    //     $jadwal = DB::table('tabel_jadwalkonsul')->where('id', $jadwalId)->first();
+        
+    //     if (!$jadwal || $jadwal->id_psikologs != Auth::guard('psikolog')->id()) {
+    //         return redirect()->route('psikolog.laporan.index')->with('error', 'Anda tidak dapat membuat laporan untuk jadwal ini.');
+    //     }
     
-        $phpWord = new \PhpOffice\PhpWord\PhpWord();
+    //     // Menyimpan laporan baru
+    //     DB::table('laporan_psikolog')->insert([
+    //         'id_jadwalkonsul' => $jadwalId,
+    //         'deskripsi_laporan' => $validated['deskripsi_laporan'],
+    //         'hasil' => $validated['hasil'] ?? null,
+    //         'status_laporan' => $validated['status_laporan'],
+    //         'id_psikolog' => Auth::guard('psikolog')->id(),
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
     
-        foreach ($laporans as $laporan) {
-            $section = $phpWord->addSection();
-    
-            // Menambahkan logo di bagian atas dokumen
-            $logoPath = public_path('assets/images/logomindhaven1.png');
-            if (file_exists($logoPath)) {
-                $section->addImage($logoPath, [
-                    'width' => 250,
-                    'height' => 150,
-                    'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
-                    'wrappingStyle' => 'inline',
-                ]);
-                $section->addTextBreak(1);
-            }
-    
-            // Judul Laporan
-            $section->addText('Laporan Psikolog', ['bold' => true, 'size' => 18, 'color' => '1F4E79'], ['alignment' => 'center']);
-            $section->addTextBreak(1);
-    
-            // Informasi Psikolog
-            $section->addText('Nama Psikolog: ' . $laporan->psikolog->nama, ['bold' => true, 'size' => 14, 'color' => '4F81BD']);
-            $section->addText('Tanggal Konsultasi: ' . \Carbon\Carbon::parse($laporan->jadwalKonsul->tanggal)->translatedFormat('l, d F Y'), ['size' => 12]);
-            $section->addText('Jam Konsultasi: ' . ($laporan->jadwalKonsul->jam ?? 'N/A'), ['size' => 12]);
-            $section->addText('Paket: ' . $laporan->paket->nama_paket, ['size' => 12]);
-            $section->addText('Harga: ' . ($laporan->paket->harga ?? 'N/A'), ['size' => 12]);
-    
-            // Hasil Konsultasi
-            $section->addText('Hasil: ', ['bold' => true, 'size' => 12]);
-            $section->addText(substr($laporan->hasil, 0, 1000) . '...', ['italic' => true, 'size' => 12]);
-    
-            // Rekomendasi
-            $section->addText('Rekomendasi: ', ['bold' => true, 'size' => 12]);
-            $section->addText($laporan->deskripsi_laporan, ['size' => 12]);
-    
-            // Status Laporan
-            $statusColor = $laporan->status_laporan === 'pending' ? 'FF0000' : '28A745';
-            $statusText = ucfirst($laporan->status_laporan);
-            $section->addText('Status: ' . $statusText, ['bold' => true, 'size' => 12, 'color' => $statusColor]);
-    
-            $section->addText('-----------------------------------------------------------', ['bold' => true, 'size' => 12]);
-            $section->addTextBreak(1);
-        }
-    
-        $filename = 'Laporan_' . $request->status_laporan . '_' . now()->format('Ymd_His') . '.docx';
-        $tempFile = tempnam(sys_get_temp_dir(), $filename);
-        $writer = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $writer->save($tempFile);
-    
-        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
-    }
+    //     return redirect()->route('psikolog.laporan.index')->with('success', 'Laporan berhasil ditambahkan.');
+    // }
     
     
 }

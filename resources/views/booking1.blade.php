@@ -32,12 +32,12 @@
             <div class="flex space-x-6 items-center">
                 <a class="text-gray-800 font-semibold hover:text-green-600" href="{{ route('dashboard') }}">Home</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Transaksi</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
     </nav>
@@ -59,7 +59,7 @@
 
                 <form action="{{ route('jadwal.store') }}" method="POST" onsubmit="return formatTanggal()">
                     @csrf
-                    
+
                     <!-- Pilih Psikolog -->
                     <div class="mb-6">
                         <label for="id_psikologs" class="block text-lg font-semibold">Pilih Psikolog</label>
@@ -108,8 +108,8 @@
         $isBooked = in_array($time, $bookedTimes);
     @endphp
 
-    <button type="button" 
-            class="time-slot-btn {{ $isBooked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white' }} p-4 rounded-lg shadow-md {{ $isBooked ? 'pointer-events-none' : 'hover:bg-green-700' }} transition duration-300" 
+    <button type="button"
+            class="time-slot-btn {{ $isBooked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white' }} p-4 rounded-lg shadow-md {{ $isBooked ? 'pointer-events-none' : 'hover:bg-green-700' }} transition duration-300"
             data-time="{{ $time }}"
             {{ $isBooked ? 'disabled' : '' }}>
         {{ $time }}
@@ -151,7 +151,7 @@
                             <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300" id="submit-time" disabled>Booking Sekarang</button>
                         </div>
                     </form>
-                    
+
                 </div>
             </div>
         </div>
@@ -217,6 +217,15 @@
                 hargaPaketText.textContent = 'Harga: -';
             }
         });
+    </script>
+     <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
     </script>
 <script>
     // Duplicate declaration removed

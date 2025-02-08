@@ -35,6 +35,7 @@ return [
     |
     */
 
+    // ori: admin session, psiko session
     'guards' => [
         'admin' => [
             'driver' => 'session',

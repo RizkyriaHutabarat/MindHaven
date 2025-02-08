@@ -21,7 +21,7 @@
         @csrf
         <div class="mb-2">
             <label for="hasil">Hasil Pemeriksaan</label>
-            <textarea name="hasil" id="hasil" class="form-control" placeholder="Hasil Pemeriksaan" required></textarea>
+            <textarea name="hasil" id="hasil" class="form-control" placeholder="Hasil Pemeriksaan"></textarea>
         </div>
         <div class="mb-2">
             <label for="deskripsi_laporan">Rekomendasi</label>

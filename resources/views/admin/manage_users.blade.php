@@ -7,7 +7,6 @@
     <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .sidebar {
             height: 100vh;
@@ -75,12 +74,12 @@
                 </a>
             </li>
             <li class="nav-item">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+            <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </li>
         </ul>
     </div>
@@ -91,16 +90,6 @@
         <div class="header mb-4">
             <h2>Manage Users</h2>
         </div>
-                 <!-- Success/Error Message -->
-                @if(session('success'))
-                <div class="mb-4 text-sm text-green-700 bg-green-100 border border-green-500 rounded p-4">
-                    {{ session('success') }}
-                </div>
-                @elseif(session('error'))
-                    <div class="mb-4 text-sm text-red-700 bg-red-100 border border-red-500 rounded p-4">
-                        {{ session('error') }}
-                    </div>
-                @endif
 
         <!-- User Table -->
         <div class="card">
@@ -155,5 +144,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
 </body>
 </html>

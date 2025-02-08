@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindHaven - Login</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;family=Playfair+Display:wght@700&amp;display=swap" rel="stylesheet"/>
@@ -33,7 +32,7 @@
     <div class="flex w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Image Section -->
         <div class="w-1/2 bg-gray-200 hidden md:block relative">
-            <img 
+            <img
                 alt="Illustration of a woman talking to a psychologist on a large smartphone screen"
                 src="{{ asset('assets/images/gambar1.png') }}"
                 class="w-full h-full object-cover"
@@ -55,7 +54,7 @@
                 @endif
 
                 <h2 class="text-center text-gray-900 mb-8 text-2xl font-bold">Login</h2>
-                <form method="POST" action="/login">
+                <form method="POST"  action="{{ route('login') }}">
                     @csrf
                     <div class="mb-9">
                         <label for="email" class="block text-gray-900 font-semibold mb-2">Email Address</label>
@@ -67,8 +66,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-800 transition duration-300 text-lg font-semibold">Login</button>
                 </form>
-                <p class="text-center text-gray-600 mt-6">Don't have an account User? <a href="/register" class="text-green-600 hover:underline">Sign Up</a></p>
-                <p class="text-center text-gray-600 mt-6">Don't have an account Psikolog? <a href=" psikolog/register" class="text-green-600 hover:underline">Sign Up</a></p>
+                <p class="text-center text-gray-600 mt-6">Don't have an account? <a href="/register" class="text-green-600 hover:underline">Sign Up</a></p>
             </div>
         </div>
     </div>

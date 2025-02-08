@@ -31,7 +31,7 @@
 
         <div class="mb-2">
             <label for="hasil" class="form-label">Hasil Pemeriksaan</label>
-            <textarea name="hasil" class="form-control" placeholder="Hasil Pemeriksaan" required>{{ old('hasil', $laporan->hasil) }}</textarea>
+            <textarea name="hasil" class="form-control" placeholder="Hasil Pemeriksaan">{{ old('hasil', $laporan->hasil) }}</textarea>
         </div>
 
         <div class="mb-2">

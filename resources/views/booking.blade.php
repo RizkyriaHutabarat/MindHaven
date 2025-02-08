@@ -7,7 +7,6 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MindHaven | Booking</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
@@ -33,12 +32,12 @@
             <div class="flex space-x-6 items-center">
                 <a class="text-gray-800 font-semibold hover:text-green-600" href="{{ route('dashboard') }}">Home</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Jadwal</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
     </nav>
@@ -58,15 +57,16 @@
                         </div>
                     @endif
                     @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show mb-6" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
+    <div class="alert alert-danger alert-dismissible fade show mb-6" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 
                 <form action="{{ route('jadwal.store') }}" method="POST" onsubmit="return formatTanggal()">
                     @csrf
-                    
+
                     <!-- Pilih Psikolog -->
                     <div class="mb-6">
                         <label for="id_psikologs" class="block text-lg font-semibold">Psikolog</label>
@@ -111,8 +111,8 @@
                                 $isBooked = in_array($time, $bookedTimes);
                             @endphp
 
-                            <button type="button" 
-                                    class="time-slot-btn {{ $isBooked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white' }} p-4 rounded-lg shadow-md {{ $isBooked ? 'pointer-events-none' : 'hover:bg-green-700' }} transition duration-300" 
+                            <button type="button"
+                                    class="time-slot-btn {{ $isBooked ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 text-white' }} p-4 rounded-lg shadow-md {{ $isBooked ? 'pointer-events-none' : 'hover:bg-green-700' }} transition duration-300"
                                     data-time="{{ $time }}"
                                     {{ $isBooked ? 'disabled' : '' }}>
                                 {{ $time }}
@@ -127,7 +127,7 @@
                             <label for="deskripsi" class="block text-lg font-semibold">Deskripsi</label>
                             <textarea name="deskripsi" id="deskripsi" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="4" placeholder="Jelaskan kebutuhan konsultasi Anda" required></textarea>
                         </div>
-                        
+
                     <!-- Jenis Konsultasi (Online atau Offline) -->
                     <div class="mb-6">
                         <label for="jenis_konsultasi" class="block text-lg font-semibold">Jenis Konsultasi</label>
@@ -143,28 +143,28 @@
                         <input type="text" name="link_meet" id="link_meet" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm" readonly placeholder="Link akan otomatis terisi jika konsultasi online">
                     </div>
 
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const jenisKonsultasiSelect = document.getElementById('jenis_konsultasi');
-                                const linkMeetInput = document.getElementById('link_meet');
-                                const meetLinks = [
-                                    'https://meet.google.com/hkw-onac-ntt',
-                                    'https://meet.google.com/fmt-nnks-ohp',
-                                    'https://meet.google.com/tba-nqxw-zbc',
-                                    'https://meet.google.com/gte-rwbi-rio'
-                                ];
+                    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const jenisKonsultasiSelect = document.getElementById('jenis_konsultasi');
+            const linkMeetInput = document.getElementById('link_meet');
+            const meetLinks = [
+                'https://meet.google.com/hkw-onac-ntt',
+                'https://meet.google.com/fmt-nnks-ohp',
+                'https://meet.google.com/tba-nqxw-zbc',
+                'https://meet.google.com/gte-rwbi-rio'
+            ];
 
-                                jenisKonsultasiSelect.addEventListener('change', function () {
-                                    if (this.value === 'online') {
-                                        const randomLink = meetLinks[Math.floor(Math.random() * meetLinks.length)];
-                                        linkMeetInput.value = randomLink;
-                                    } else {
-                                        linkMeetInput.value = ''; // Kosongkan jika offline
-                                    }
-                                });
-                                
-                            });
-                        </script>
+            jenisKonsultasiSelect.addEventListener('change', function () {
+                if (this.value === 'online') {
+                    const randomLink = meetLinks[Math.floor(Math.random() * meetLinks.length)];
+                    linkMeetInput.value = randomLink;
+                } else {
+                    linkMeetInput.value = ''; // Kosongkan jika offline
+                }
+            });
+
+        });
+    </script>
 
                             <!-- Metode Pembayaran -->
                             <div class="mb-6">
@@ -209,38 +209,19 @@
                                 });
                             </script>
 
-                            <!-- Bukti Pembayaran -->
-                            <div class="mb-6">
-                                <label for="bukti_pembayaran" class="block text-lg font-semibold">Unggah Bukti Pembayaran <span class="text-red-500">*</span></label>
-                                <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" accept=".jpg,.jpeg,.png,.pdf" required>
-                                <small class="form-text text-muted">File yang diperbolehkan: JPG, JPEG, PNG, PDF (maks. 2MB)</small>
-                            </div>
+                        <!-- Bukti Pembayaran -->
+                        <div class="mb-6">
+                            <label for="bukti_pembayaran" class="block text-lg font-semibold">Unggah Bukti Pembayaran</label>
+                            <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" accept=".jpg,.jpeg,.png,.pdf">
+                            <small class="form-text text-muted">File yang diperbolehkan: JPG, JPEG, PNG, PDF (maks. 2MB)</small>
+                        </div>
 
-                            <!-- Submit Button -->
-                            <div class="mb-6">
-                                <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300 disabled-button" id="submit-button" disabled>Booking Sekarang</button>
-                            </div>
+                        <!-- Submit Button -->
+                        <div class="mb-6">
+                            <button type="submit" class="w-full bg-indigo-600 text-white p-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-300" id="submit-time" disabled>Booking Sekarang</button>
+                        </div>
+                    </form>
 
-                            <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const buktiPembayaranInput = document.getElementById('bukti_pembayaran');
-                                const submitButton = document.getElementById('submit-button');
-
-                                buktiPembayaranInput.addEventListener('change', function () {
-                                    if (buktiPembayaranInput.files.length > 0) {
-                                        submitButton.disabled = false;
-                                        submitButton.classList.remove('disabled-button');
-                                        submitButton.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
-                                    } else {
-                                        submitButton.disabled = true;
-                                        submitButton.classList.add('disabled-button');
-                                        submitButton.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
-                                    }
-                                });
-                            });
-                            </script>
-                </form>
-                    
                 </div>
             </div>
         </div>
@@ -280,9 +261,9 @@ timeSlots.forEach(button => {
             alert('Jam ini sudah dipesan, silakan pilih waktu lain.');
             return;  // Tidak lanjutkan proses jika waktu sudah dipesan
         }
-        
+
         const selectedTime = button.getAttribute('data-time');
-        
+
         // Memperbarui tampilan waktu dan mengisi input tersembunyi
         selectedTimeText.textContent = `Jam yang dipilih: ${selectedTime}`;
         timeInput.value = selectedTime;
@@ -310,6 +291,15 @@ timeSlots.forEach(button => {
                 hargaPaketText.textContent = 'Harga: -';
             }
         });
+    </script>
+     <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('user_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
     </script>
 <script>
     // Duplicate declaration removed

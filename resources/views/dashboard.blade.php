@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MindHaven</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Nunito:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
@@ -70,6 +69,11 @@
 <body class="font-roboto">
         <nav class="bg-primary-200 py-2">
         <div class="container mx-auto flex justify-between items-center px-4">
+        @if (session('user_token'))
+    <<script>
+        localStorage.setItem('user_token', '{{ session('user_token') }}');
+    </script>
+    @endif
             <div class="logo text-2xl font-bold text-gray-800">MindHaven</div>
             <div class="relative flex-1 max-w-sm hidden lg:block">
                 <input class="pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 w-full" placeholder="Search plants..." type="text" />
@@ -82,12 +86,12 @@
                 <!-- <a class="text-gray-800 hover:text-green-600" href="#testimonial">Reviews</a> -->
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Jadwal</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.riwayat') }}">Laporan</a>
-                <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="nav-link">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
         </nav>
@@ -541,5 +545,15 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
 </body>
 </html>

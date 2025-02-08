@@ -7,7 +7,6 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MindHaven | Transaksi</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
@@ -42,12 +41,12 @@
                 <a class="text-gray-800 font-semibold hover:text-green-600" href="{{ route('dashboard') }}">Home</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Jadwal</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.riwayat') }}">Laporan</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
     </nav>
@@ -78,7 +77,7 @@
                         <p class="text-md text-gray-600">Tanggal Konsultasi: <strong>{{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('l, d F Y') }}</strong></p>
                         <p class="text-md text-gray-600">Jam: <strong>{{ $jadwal->jam }}</strong></p>
                         <p class="text-md">
-                            Status Pembayaran: 
+                            Status Pembayaran:
                             @if($jadwal->status_pembayaran == 'verified')
                                 <span class="text-green-600 font-semibold">Verified</span>
                             @elseif($jadwal->status_pembayaran == 'pending')
@@ -96,7 +95,7 @@
                         @else
                             <p class="text-md text-red-500">Link Meet: <strong>Admin Akan Memverifikasi Pembayaran Anda</strong></p>
                         @endif
-                        
+
 
                         <p class="text-md text-gray-600">Deskripsi: <strong>{{ $jadwal->deskripsi }}</strong></p>
                         <p class="text-md text-gray-600">Metode Pembayaran: <strong>{{ $jadwal->metodepembayaran }}</strong></p>
@@ -111,7 +110,7 @@
                                     <i class="fas fa-calendar-times mr-2"></i> Reschedule Tidak Tersedia
                                 </button>
                             @else
-                                <a href="{{ route('jadwalkonsul.edit', $jadwal->id) }}" 
+                                <a href="{{ route('jadwalkonsul.edit', $jadwal->id) }}"
                                 class="btn btn-warning bg-yellow-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-yellow-600 hover:shadow-lg transition duration-300 transform hover:scale-105">
                                     <i class="fas fa-calendar-check mr-2"></i> Reschedule
                                 </a>
@@ -131,6 +130,15 @@
                 alert.style.display = 'none';
             }
         }
+    </script>
+     <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
     </script>
 
 </body>

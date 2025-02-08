@@ -7,7 +7,6 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>MindHaven | Transaksi</title>
-    <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
@@ -33,12 +32,12 @@
             <div class="flex space-x-6 items-center">
                 <a class="text-gray-800 font-semibold hover:text-green-600" href="{{ route('dashboard') }}">Home</a>
                 <a class="text-gray-800 hover:text-green-600" href="{{ route('user.jadwal') }}">Transaksi</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+                <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </div>
         </div>
     </nav>
@@ -67,7 +66,7 @@
                     <strong>Harga:</strong> Rp{{ number_format($booking->paket->harga) }}
                 </div>
                 <div class="mb-3">
-                    <strong>Tanggal dan Hari Konsultasi:</strong> 
+                    <strong>Tanggal dan Hari Konsultasi:</strong>
                     {{ \Carbon\Carbon::parse($booking->tanggal)->translatedFormat('l, d F Y') }}
                 </div>
                 <div class="mb-3">
@@ -89,7 +88,7 @@
                 <div class="mb-3">
                     @if($booking->bukti_pembayaran)
                         <strong>Bukti Pembayaran: <a href="{{ asset('storage/bukti_pembayaran/' . $booking->bukti_pembayaran) }}" target="_blank">Lihat Bukti</a></strong>
-                    @endif  
+                    @endif
                 </div>
                 <div class="mb-3">
                     <strong>Status Pembayaran:</strong>
@@ -106,5 +105,14 @@
     </div>
 </div>
 @endsection
+<script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
 </body>
 </html>

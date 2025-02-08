@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin | Manage Jadwal Konsultasi</title>
+    <title>Admin | Manage Paket</title>
     <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -76,12 +76,12 @@
                 </a>
             </li>
             <li class="nav-item">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+            <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </li>
         </ul>
     </div>
@@ -99,7 +99,7 @@
 
         <div class="container-fluid">
             <div class="row">
-        
+
 
 <!-- Jadwal Konsultasi Table -->
 <div class="card">
@@ -139,7 +139,7 @@
                                 @if($jadwal->link_meet)
                                     <strong></strong> {{ $jadwal->link_meet }}
                                 @else
-                                    <strong></strong> User Memilih Offline
+                                    <strong></strong> Kamu Memilih Offline
                                 @endif
                             </td>
                             <td>{{ $jadwal->metodepembayaran }}</td>
@@ -161,43 +161,13 @@
                                 <!-- <a href="{{ route('admin.edit_jadwalkonsul', $jadwal->id) }}" class="btn btn-warning btn-sm">
                                     <i class="fas fa-edit"></i> Edit
                                 </a> -->
-                        <!-- Include SweetAlert2 CDN -->
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-                        <!-- Hapus Jadwal -->
-                        <form action="{{ route('admin.delete_jadwalkonsul', $jadwal->id) }}" method="POST" style="display:inline;" id="deleteForm_{{ $jadwal->id }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm" onclick="showDeleteAlert({{ $jadwal->id }})">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </button>
-                        </form>
-
-                        <script>
-                        function showDeleteAlert(id) {
-                            Swal.fire({
-                            title: 'Apakah Anda yakin?',
-                            text: "Jadwal ini akan dihapus secara permanen!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Hapus!',
-                            cancelButtonText: 'Batal'
-                            }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Jika pengguna menekan Hapus, submit form untuk menghapus
-                                document.getElementById('deleteForm_' + id).submit();
-                                Swal.fire(
-                                'Dihapus!',
-                                'Jadwal konsultasi telah dihapus.',
-                                'success'
-                                );
-                            }
-                            });
-                        }
-                        </script>
-
+                                <form action="{{ route('admin.delete_jadwalkonsul', $jadwal->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this schedule?')">
+                                        <i class="fas fa-trash-alt"></i> Delete
+                                    </button>
+                                </form>
                                 <!-- Status Pembayaran Button -->
                                 <form action="{{ route('admin.update_status_pembayaran', $jadwal->id) }}" method="POST" style="display:inline;">
                                     @csrf
@@ -219,6 +189,16 @@
         </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
+
 </body>
 </html>
 

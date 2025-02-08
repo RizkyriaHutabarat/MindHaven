@@ -7,34 +7,6 @@
     <link rel="icon" href="{{ asset('assets/images/logo2.png') }}" type="image/png" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <style>
-        button {
-            background-color: #007bff; /* Warna tombol biru */
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #0056b3; /* Warna tombol biru saat hover */
-        }
-
-        button:focus {
-            outline: none; /* Menghapus outline saat tombol difokuskan */
-        }
-
-        label {
-            font-weight: bold;
-        }
-
-        .badge {
-            font-size: 0.875rem;
-        }
-    </style>
 </head>
 <body>
 @extends('layouts.psikolog')
@@ -54,18 +26,6 @@
     @if($jadwals->isEmpty())
         <p>Belum ada jadwal konsultasi yang tersedia.</p>
     @else
-    <form action="{{ route('laporan.download') }}" method="GET" class="mb-4">
-        <div class="form-group">
-            <label for="status_laporan">Pilih Status Laporan:</label>
-            <select name="status_laporan" id="status_laporan" class="form-control" required>
-                <option value="pending">Pending</option>
-                <option value="selesai">Selesai</option>
-                <option value="ditolak">Ditolak</option>
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Download Laporan</button>
-    </form>
-
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -87,8 +47,10 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $jadwal->user_name }}</td>
                     <td>{{ $jadwal->nama_paket }}</td>
-                    <td>{{ $jadwal->deskripsi }}</td>
-                    <td>{{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('l, d F Y') }} {{ $jadwal->jam }}</td>
+                    <td>{{ $jadwal->deskripsi}}</td>
+                    <td>{{ \Carbon\Carbon::parse($jadwal->tanggal)->translatedFormat('l, d F Y') }}
+                        {{ $jadwal->jam }}
+                    </td>
                     <td>
                         @if($jadwal->link_meet)
                             <p class="text-md text-gray-600">Link Meet: <strong>{{ $jadwal->link_meet }}</strong></p>
@@ -96,6 +58,7 @@
                             <p class="text-md text-gray-600">Link Meet: <strong>Klien Memilih offline</strong></p>
                         @endif
                     </td>
+                    <!-- Menampilkan deskripsi, hasil, dan status laporan -->
                     <td>
                         @php
                             $laporan = $laporans->firstWhere('id_jadwalkonsul', $jadwal->id);
@@ -106,6 +69,7 @@
                         {{ $laporan ? $laporan->hasil : '-' }}
                     </td>
                     <td>
+                        <!-- Check if laporan has status, if not, display a default color -->
                         <span class="badge 
                             @if($laporan && $laporan->status_laporan == 'pending') badge-warning
                             @elseif($laporan && $laporan->status_laporan == 'selesai') badge-success
@@ -118,9 +82,12 @@
 
                     <td>
                         @if($laporan)
+                            <!-- Tombol Edit jika laporan sudah ada -->
                             <a href="{{ route('psikolog.laporan.edit', $laporan->id) }}" class="btn btn-warning btn-sm">Edit</a>
                         @else
-                            <a href="{{ route('psikolog.laporan.form', ['jadwalId' => $jadwal->id]) }}" class="btn btn-primary btn-sm">Tambah Laporan</a>
+                            <!-- Tombol Tambah jika laporan belum ada, link ke form -->
+                            <a href="{{ route('psikolog.laporan.forms', ['jadwalId' => $jadwal->id]) }}" class="btn btn-primary btn-sm">Buat Laporan</a>
+
                         @endif
                     </td>
                 </tr>

@@ -76,12 +76,12 @@
                 </a>
             </li>
             <li class="nav-item">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+            <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </li>
         </ul>
     </div>
@@ -131,47 +131,11 @@
                     <td>Rp {{ number_format($paket->harga, 0, ',', '.') }}</td>
                     <td>
                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editPaketModal{{ $paket->id }}">Edit</button>
-                        <!-- <form action="{{ route('admin.delete_paket', $paket->id) }}" method="POST" class="d-inline">
+                        <form action="{{ route('admin.delete_paket', $paket->id) }}" method="POST" class="d-inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus paket ini?')">Delete</button>
-                        </form> -->
-                        <!-- Include SweetAlert2 CDN -->
-                        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-                        <!-- Hapus Jadwal -->
-                        <form action="{{ route('admin.delete_paket', $paket->id) }}" method="POST" style="display:inline;" id="deleteForm_{{ $paket->id }}">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button" class="btn btn-danger btn-sm" onclick="showDeleteAlert({{ $paket->id }})">
-                                <i class="fas fa-trash-alt"></i> Delete
-                            </button>
                         </form>
-
-                        <script>
-                        function showDeleteAlert(id) {
-                            Swal.fire({
-                            title: 'Apakah Anda yakin?',
-                            text: "Paket ini akan dihapus secara permanen!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Hapus!',
-                            cancelButtonText: 'Batal'
-                            }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Jika pengguna menekan Hapus, submit form untuk menghapus
-                                document.getElementById('deleteForm_' + id).submit();
-                                Swal.fire(
-                                'Dihapus!',
-                                'Paket konsultasi telah dihapus.',
-                                'success'
-                                );
-                            }
-                            });
-                        }
-                        </script>
                     </td>
                 </tr>
 
@@ -256,6 +220,15 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function handleLogout() {
+    // Hapus token dari localStorage
+    localStorage.removeItem('admin_token');
+
+    // Submit form logout
+    document.getElementById('logout-form').submit();
+}
+    </script>
 </body>
 
 </html>

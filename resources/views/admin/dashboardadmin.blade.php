@@ -57,6 +57,11 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h3 class="text-center mt-3">Dashboard</h3>
+          @if (session('admin_token'))
+    <<script>
+        localStorage.setItem('admin_token', '{{ session('admin_token') }}');
+    </script>
+    @endif
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.dashboard') }}">
@@ -89,18 +94,18 @@
                 </a>
             </li>
             <li class="nav-item">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
+            <a href="#" class="nav-link" onclick="handleLogout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                @csrf
+            </form>
             </li>
         </ul>
     </div>
 
-    <!-- Main Content -->
-    <div class="content">
+   <!-- Main Content -->
+   <div class="content">
         <!-- Header -->
         <div class="header">
             <div class="d-flex justify-content-between">
@@ -115,35 +120,48 @@
         <!-- Dashboard Cards -->
         <div class="row">
             <!-- Card 1 -->
+            @php
+            use App\Models\User;
+            use App\Models\Psikolog;
+            use App\Models\JadwalKonsul;
+
+            // Menghitung jumlah user
+            $totalUsers = User::count();
+            // Menghitung jumlah psikolog
+            $totalPsikolog = Psikolog::count();
+            // Menghitung jumlah jadwal konsultasi
+            $totalJadwalKonsultasi = JadwalKonsul::count();
+            @endphp
+
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header text-center">
                         Total Users
                     </div>
-                    <div class="card-body">
-                        <h5>1,234</h5>
+                    <div class="card-body text-center">
+                        <h5>{{ $totalUsers }}</h5>
                     </div>
                 </div>
             </div>
             <!-- Card 2 -->
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header">
-                        Active Sessions
+                    <div class="card-header text-center">
+                        Total Psikolog
                     </div>
-                    <div class="card-body">
-                        <h5>56</h5>
+                    <div class="card-body text-center">
+                        <h5>{{ $totalPsikolog }}</h5>
                     </div>
                 </div>
             </div>
             <!-- Card 3 -->
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header">
-                        New Messages
+                    <div class="card-header text-center">
+                        Total Jadwal Konsultasi
                     </div>
-                    <div class="card-body">
-                        <h5>12</h5>
+                    <div class="card-body text-center">
+                        <h5>{{ $totalJadwalKonsultasi }}</h5>
                     </div>
                 </div>
             </div>
@@ -153,10 +171,10 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">
-                        Payment Status Overview
+                    <div class="card-header text-center">
+                        Status Pembayaran
                     </div>
-                    <div class="card-body">
+                    <div class="card-body text-center">
                         <canvas id="paymentStatusChart"></canvas>
                     </div>
                 </div>
@@ -165,7 +183,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
+    <<script>
         var ctx = document.getElementById('paymentStatusChart').getContext('2d');
         var paymentStatusChart = new Chart(ctx, {
             type: 'bar',

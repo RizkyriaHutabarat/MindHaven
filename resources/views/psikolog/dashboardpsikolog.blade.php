@@ -14,6 +14,11 @@
 
     <!-- Main Content -->
     <div class="content">
+    @if (session('psikolog_token'))
+    <<script>
+        localStorage.setItem('psikolog_token', '{{ session('psikolog_token') }}');
+    </script>
+    @endif
         <!-- Header -->
         <div class="header">
             <div class="d-flex justify-content-between">
@@ -26,73 +31,90 @@
         </div>
 
         <!-- Dashboard Cards -->
-        <div class="row">
-            <!-- Card 1 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        Total Users
-                    </div>
-                    <div class="card-body">
-                        <h5>1,234</h5>
-                    </div>
+    <div class="row">
+        <!-- Card 1 -->
+        <div class="col-md-4">
+            <?php 
+            use App\Models\LaporanPsikolog;
+            use Illuminate\Support\Facades\Auth;
+
+            // Ambil ID psikolog yang sedang login
+            $id_psikolog = Auth::user()->id;
+
+
+            // Menghitung jumlah laporan berdasarkan status dan ID psikolog
+            $pendingCount = LaporanPsikolog::where('id_psikolog', $id_psikolog)
+                ->where('status_laporan', 'pending')->count();
+
+            $completedCount = LaporanPsikolog::where('id_psikolog', $id_psikolog)
+                ->where('status_laporan', 'selesai')->count();
+
+            $inProgressCount = LaporanPsikolog::where('id_psikolog', $id_psikolog)
+                ->where('status_laporan', 'ditolak')->count();
+            ?>
+            <div class="card">
+                <div class="card-header text-center">
+                    Laporan Pending
                 </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        Active Sessions
-                    </div>
-                    <div class="card-body">
-                        <h5>56</h5>
-                    </div>
-                </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        New Messages
-                    </div>
-                    <div class="card-body">
-                        <h5>12</h5>
-                    </div>
+                <div class="card-body text-center">
+                    <h5>{{ $pendingCount }}</h5>
                 </div>
             </div>
         </div>
-
-        <!-- Additional Content -->
-        <div class="row">
-            <div class="col-md-6">
-                <!-- Chart or Additional Widgets Here -->
-                <div class="card">
-                    <div class="card-header">
-                        Sales Overview
-                    </div>
-                    <div class="card-body">
-                        <!-- Add a chart here -->
-                        <p>Chart goes here</p>
-                    </div>
+        <!-- Card 2 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    Laporan Selesai
+                </div>
+                <div class="card-body text-center">
+                    <h5>{{ $completedCount }}</h5>
                 </div>
             </div>
-            <div class="col-md-6">
-                <!-- Activity Log or Other Content -->
-                <div class="card">
-                    <div class="card-header">
-                        Recent Activities
-                    </div>
-                    <div class="card-body">
-                        <ul>
-                            <li>User1 logged in</li>
-                            <li>User2 sent a message</li>
-                            <li>User3 updated profile</li>
-                        </ul>
-                    </div>
+        </div>       
+    </div>
+
+    <!-- Laporan Status Overview -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    Status Laporan
+                </div>
+                <div class="card-body text-center">
+                    <canvas id="laporanStatusChart"></canvas>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<<script>
+    var ctx = document.getElementById('laporanStatusChart').getContext('2d');
+    var laporanStatusChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pending', 'Selesai'],
+            datasets: [{
+                label: 'Status Laporan',
+                data: [@json($pendingCount), @json($completedCount)],
+                backgroundColor: ['#f39c12', '#2ecc71'],
+                borderColor: ['#e67e22', '#27ae60'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 
 
     <!-- Scripts -->

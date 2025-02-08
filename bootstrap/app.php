@@ -11,6 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // setup sanctum middleware
+
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
